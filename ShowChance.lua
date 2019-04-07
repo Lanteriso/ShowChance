@@ -57,6 +57,21 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_InterruptList[10] == nil then ST_InterruptList[10] = false end   --躲闪
 		if ST_InterruptList[11] == nil then ST_InterruptList[11] = false end   --招架
 		if ST_InterruptList[12] == nil then ST_InterruptList[12] = false end   --格挡
+
+
+		if ST_TextList == nil then ST_TextList = {} end
+		if ST_TextList[1] == nil then ST_TextList[1] = "玩家名称" end   --玩家名称
+		if ST_TextList[2] == nil then ST_TextList[2] = "装等" end   --装等
+		if ST_TextList[3] == nil then ST_TextList[3] = "主属性" end   --力量
+		if ST_TextList[4] == nil then ST_TextList[4] = "护甲" end   --护甲
+		if ST_TextList[5] == nil then ST_TextList[5] = "暴击" end   --暴击
+		if ST_TextList[6] == nil then ST_TextList[6] = "急速" end   --急速
+		if ST_TextList[7] == nil then ST_TextList[7] = "精通" end   --精通
+		if ST_TextList[8] == nil then ST_TextList[8] = "全能" end   --全能
+		if ST_TextList[9] == nil then ST_TextList[9] = "吸血" end   --吸血
+		if ST_TextList[10] == nil then ST_TextList[10] = "躲闪" end   --躲闪
+		if ST_TextList[11] == nil then ST_TextList[11] = "招架" end   --招架
+		if ST_TextList[12] == nil then ST_TextList[12] = "格挡" end   --格挡
 		
 	end
 end)
@@ -82,7 +97,7 @@ ST_Options:SetScript("OnShow", function(self)
 	thanksto:SetWidth(500)
 	thanksto:SetPoint("BOTTOMLEFT", website, "TOPLEFT", 0, 8)
 	thanksto:SetJustifyH("LEFT")
-	thanksto:SetText("修改字体大小方法：在聊天框输入例如/sc 30\n|r提示：字体大小默认是20，/sc 字体大小可能随便填")	
+	thanksto:SetText("修改字体大小方法：在聊天框输入例如/sc 30\n|r提示：字体大小默认是20，/sc 字体大小可以随便填")	
 	
 	local count,countx=0,0
 	for key,value in pairs(ST_InterruptList) do
@@ -90,7 +105,7 @@ ST_Options:SetScript("OnShow", function(self)
 		if count>12 then countx,count=countx+1,0 end
 		local button = CreateFrame("CheckButton", "ST_Buff_"..key, ST_Options, "InterfaceOptionsCheckButtonTemplate")
 		button:SetPoint("TOPLEFT", 32+150*countx, -32-32*count)
-		getglobal(button:GetName().."Text"):SetText(key)
+		getglobal(button:GetName().."Text"):SetText(ST_TextList[key])
 		--print(getglobal(button:GetName().."Text"))
 		if value == true then button:SetChecked(true) else button:SetChecked(false) end
 	end	
@@ -175,7 +190,7 @@ skillTable = {
 
 -- OnLoad event
 function ShowChance_OnLoad()
-  ChatFrame1:AddMessage("+ |cFFFF0000ShowChance |开启.");
+  ChatFrame1:AddMessage("+ |cFFFF0000ShowChance已开启,祝你天天泰坦.");
 end
 
 -- Config Panel Code
@@ -193,9 +208,20 @@ end
  -- 	getglobal(this:GetName().."CheckButtonTime24"):SetChecked( myClockConfig[myClockRealm][myClockChar].time24 );		
  -- 	getglobal(this:GetName().."SliderOffset"):SetValue( myClockConfig[myClockRealm].offset );
  end
- 
+--JANY进入战斗离开战斗
+ShowChance:RegisterEvent("PLAYER_REGEN_DISABLED")
+ShowChance:RegisterEvent("PLAYER_REGEN_ENABLED")   
+ShowChance:SetScript("OnEvent", function (self,event)
+	if event == "PLAYER_REGEN_ENABLED" then
+		ShowChance_UpdateInterval = 5.0
+		UIFrameFadeOut(ShowChance_FrameText, 2, 1, 0.5)--淡入
+	elseif event == "PLAYER_REGEN_DISABLED" then
+		ShowChance_UpdateInterval = 1.0
+		UIFrameFadeOut(ShowChance_FrameText, 2, 0.5, 1)--淡入
+	end	
+end);
 
-function ShowChance_OnUpdate(self, elapsed)
+function ShowChance_OnUpdate(self, elapsed,event)
 
 	self.TimeSinceLastUpdate = self.TimeSinceLastUpdate + elapsed;
 
@@ -205,7 +231,6 @@ function ShowChance_OnUpdate(self, elapsed)
 --			
 --		end
 --	end
-
 
 	if (self.TimeSinceLastUpdate > ShowChance_UpdateInterval) then
 		--jany3
@@ -222,7 +247,7 @@ function ShowChance_OnUpdate(self, elapsed)
 			
 			if ST_InterruptList[2] then
 				IL_C = {GetAverageItemLevel()}
-				IL = "物品等级"..string.format("%.1f", IL_C[2]).."\n|r"		--	物品等级
+				IL = "物品等级 "..string.format("%.1f", IL_C[2]).."\n|r"		--	物品等级
 			else
 				IL = ""
 			end	
@@ -240,9 +265,9 @@ function ShowChance_OnUpdate(self, elapsed)
 						janycoloredText[1] = "|cFFFF0000";
 					else
 						janyRecordHigh[1] = S_C;
-						janycoloredText[1] = "";
+						janycoloredText[1] = "|cFFFFFFFF";
 					end
-					S = "力量"..janycoloredText[1]..S_C.."\n|r"
+					S = "力量 "..janycoloredText[1]..S_C.."\n|r"
 				elseif AG_C > S_C and AG_C > IN_C then
 					if (AG_C> janyRecordHigh[1]) then
 						janyRecordHigh[1] = AG_C;
@@ -252,9 +277,9 @@ function ShowChance_OnUpdate(self, elapsed)
 						janycoloredText[1] = "|cFFFF0000";
 					else
 						janyRecordHigh[1] = AG_C;
-						janycoloredText[1] = "";
+						janycoloredText[1] = "|cFFFFFFFF";
 					end
-					S = "敏捷"..janycoloredText[1]..AG_C.."\n|r"
+					S = "敏捷 "..janycoloredText[1]..AG_C.."\n|r"
 				elseif IN_C > S_C and IN_C > AG_C then
 					if (IN_C> janyRecordHigh[1]) then
 						janyRecordHigh[1] = IN_C;
@@ -264,9 +289,9 @@ function ShowChance_OnUpdate(self, elapsed)
 						janycoloredText[1] = "|cFFFF0000";
 					else
 						janyRecordHigh[1] = IN_C;
-						janycoloredText[1] = "";
+						janycoloredText[1] = "|cFFFFFFFF";
 					end
-					S = "智力"..janycoloredText[1]..IN_C.."\n|r"
+					S = "智力 "..janycoloredText[1]..IN_C.."\n|r"
 				end
 			else
 				S = ""
@@ -281,9 +306,9 @@ function ShowChance_OnUpdate(self, elapsed)
 					janycoloredText[2] = "|cFFFF0000";
 				else
 					janyRecordHigh[2] = A_C[2];
-					janycoloredText[2] = "";
+					janycoloredText[2] = "|cFFFFFFFF";
 				end
-				A = "护甲"..janycoloredText[2]..A_C[2].."\n|r"
+				A = "护甲 "..janycoloredText[2]..A_C[2].."\n|r"
 			else
 				A = ""
 			end
@@ -298,9 +323,9 @@ function ShowChance_OnUpdate(self, elapsed)
 					janycoloredText[3] = "|cFFFF0000";
 				else
 					janyRecordHigh[3] = GetCritChance();
-					janycoloredText[3] = "";
+					janycoloredText[3] = "|cFFFFFFFF";
 				end
-				CC = "暴击"..janycoloredText[3]..string.format("%.1f", GetCritChance()).."%\n|r" 
+				CC = "暴击 "..janycoloredText[3]..string.format("%.1f", GetCritChance()).."%\n|r" 
 			else
 				CC =""
 			end
@@ -314,9 +339,9 @@ function ShowChance_OnUpdate(self, elapsed)
 					janycoloredText[4] = "|cFFFF0000";
 				else
 					janyRecordHigh[4] = GetHaste();
-					janycoloredText[4] = "";
+					janycoloredText[4] = "|cFFFFFFFF";
 				end
-				H = "急速"..janycoloredText[4]..string.format("%.1f", GetHaste()).."%\n|r" --	 急速
+				H = "急速 "..janycoloredText[4]..string.format("%.1f", GetHaste()).."%\n|r" --	 急速
 			else
 				H = ""
 			end
@@ -329,36 +354,36 @@ function ShowChance_OnUpdate(self, elapsed)
 					janycoloredText[5] = "|cFFFF0000";
 				else
 					janyRecordHigh[5] = GetMasteryEffect();
-					janycoloredText[5] = "";
+					janycoloredText[5] = "|cFFFFFFFF";
 				end
-				M = "精通"..janycoloredText[5]..string.format("%.1f", GetMasteryEffect()).."%\n|r" --	 精通
+				M = "精通 "..janycoloredText[5]..string.format("%.1f", GetMasteryEffect()).."%\n|r" --	 精通
 			else
 				M = ""
 			end
 				
 			if ST_InterruptList[8] then
-				V  = " 全能"..string.format("%.1f", GetCombatRatingBonus(29)).."%\n|r"			-- 全能
+				V  = "全能 |cFFFFFFFF"..string.format("%.1f", GetCombatRatingBonus(29)).."%\n|r"			-- 全能
 			else
 				V = ""
 			end
 			if ST_InterruptList[9] then
-				LS  = " 吸血"..string.format("%.1f", GetCombatRatingBonus(17)).."%\n|r"			-- 吸血	
+				LS  = "吸血 |cFFFFFFFF"..string.format("%.1f", GetCombatRatingBonus(17)).."%\n|r"			-- 吸血	
 			else
 				LS =""
 			end
 			if ST_InterruptList[10] then
-				DC = " 躲闪"..string.format("%.1f", GetDodgeChance()).."%\n|r"		--	躲闪
+				DC = "躲闪 |cFFFFFFFF"..string.format("%.1f", GetDodgeChance()).."%\n|r"		--	躲闪
 			else
 				DC = ""
 			end
 			if ST_InterruptList[11] then
-				PC = " 招架"..string.format("%.1f", GetParryChance()).."%\n|r"		--	招架
+				PC = "招架 |cFFFFFFFF"..string.format("%.1f", GetParryChance()).."%\n|r"		--	招架
 			else
 				PC =""
 			end
 
 			if ST_InterruptList[12] then
-				BC = " 格挡"..string.format("%.1f", GetBlockChance()).."%"			-- 格挡	
+				BC = "格挡 |cFFFFFFFF"..string.format("%.1f", GetBlockChance()).."%"			-- 格挡	
 			else
 				BC = ""
 			end
@@ -423,6 +448,9 @@ function ShowChance_OnUpdate(self, elapsed)
 		
 		-- actual output
 		--ShowChance_FrameText:SetText(line1forOutput.."\n|r"..skillTable[LD_iCurrent]..": "..comma_value(line2text).."\n|r"..skillTable[LD_iCurrent3]..": "..line3text.."%");
+
+		
+		ShowChance_FrameText:SetJustifyH("LEFT")
 		ShowChance_FrameText:SetFont(GameFontNormal:GetFont(), SFF)
 		ShowChance_FrameText:SetText(N..IL..S..A..CC..H..M..V..LS..DC..PC..BC);
 		-- reset update counter
@@ -517,4 +545,5 @@ function comma_value(amount)
 end
 
 
+UIFrameFadeOut(ShowChance_FrameText, 1, 0.2, 0.8)
 
