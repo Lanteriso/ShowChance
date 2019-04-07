@@ -1,3 +1,123 @@
+local ShowChance = CreateFrame("Frame")
+-- 首次登陆加载
+local SFF = 20
+local ShowChance_Load = CreateFrame("Frame")
+ShowChance_Load:RegisterEvent("ADDON_LOADED")
+ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
+	if event == "ADDON_LOADED" and addon == "ShowChance" then
+
+		if ST_BuffList == nil then ST_BuffList = {} end
+    	--BUFF
+		if ST_BuffList[1459] == nil then ST_BuffList[1459] = true end -- FS [奥术光辉]
+		if ST_BuffList[633] == nil then ST_BuffList[633] = true end       -- SQ [圣疗术 633]   25771
+		if ST_BuffList[203538] == nil then ST_BuffList[203538] = true end -- SQ [强效王者祝福]
+		if ST_BuffList[203539] == nil then ST_BuffList[203539] = true end -- SQ [强效智慧祝福]
+		if ST_BuffList[546] == nil then ST_BuffList[546] = true end     --SM [水上行走] 		
+		if ST_BuffList[61295] == nil then ST_BuffList[61295] = true end --SM [激流]	
+		if ST_BuffList[8936] == nil then ST_BuffList[8936] = true end     -- XD [愈合]	
+		if ST_BuffList[774] == nil then ST_BuffList[774] = true end       -- XD [回春术]		
+		if ST_BuffList[102342] == nil then ST_BuffList[102342] = true end --XD [铁木树皮]	
+		if ST_BuffList[33763] == nil then ST_BuffList[33763] = true end   -- XD [生命绽放]	
+		if ST_BuffList[5697] == nil then ST_BuffList[5697] = true end -- SS [无尽呼吸]	
+		if ST_BuffList[116841] == nil then ST_BuffList[116841] = true end --WS [迅如猛虎]
+		if ST_BuffList[124682] == nil then ST_BuffList[124682] = true end --WS [氤氲之雾]
+		if ST_BuffList[116849] == nil then ST_BuffList[116849] = true end --WS [作茧缚命]
+		if ST_BuffList[115151] == nil then ST_BuffList[115151] = true end --WS [复苏之雾]
+		if ST_BuffList[115175] == nil then ST_BuffList[115175] = true end --WS [抚慰之雾]
+		if ST_BuffList[121536] == nil then ST_BuffList[121536] = true end    -- MS [天堂之羽]
+		if ST_BuffList[186263] == nil then ST_BuffList[186263] = true end    --MS [暗影愈合]
+		if ST_BuffList[33206] == nil then ST_BuffList[33206] = true end      --MS [痛苦压制]
+		if ST_BuffList[17] == nil then ST_BuffList[17] = true end            --MS [真言术：盾]
+		if ST_BuffList[194509] == nil then ST_BuffList[194509] = true end    --MS[真言术：耀]
+		if ST_BuffList[62618] == nil then ST_BuffList[62618] = true end      --MS[真言术：障]
+		if ST_BuffList[21562] == nil then ST_BuffList[21562] = true end      --MS[真言术：韧] 
+
+    	--驱散
+		if ST_BuffList[51886] == nil then ST_BuffList[51886] = true end   -- SM 净化灵魂	
+		if ST_BuffList[88423] == nil then ST_BuffList[88423] = true end   -- XD [自然之愈]		
+		if ST_BuffList[213644] == nil then ST_BuffList[213644] = true end -- SQ [清毒术]		
+		if ST_BuffList[475] == nil then ST_BuffList[475] = true end       -- FS [解除诅咒]	
+		if ST_BuffList[119905] == nil then ST_BuffList[119905] = true end -- SS [烧灼驱魔]	
+		if ST_BuffList[218164] == nil then ST_BuffList[218164] = true end --WS [清创生血]
+		if ST_BuffList[527] == nil then ST_BuffList[527] = true end       --MS [纯净术]
+		if ST_BuffList[32375] == nil then ST_BuffList[32375] = true end   --MS [群体驱散]
+
+		--打断
+
+		if ST_InterruptList == nil then ST_InterruptList = {} end
+		if ST_InterruptList[1] == nil then ST_InterruptList[1] = false end   --玩家名称
+		if ST_InterruptList[2] == nil then ST_InterruptList[2] = false end   --装等
+		if ST_InterruptList[3] == nil then ST_InterruptList[3] = true end   --力量
+		if ST_InterruptList[4] == nil then ST_InterruptList[4] = true end   --护甲
+		if ST_InterruptList[5] == nil then ST_InterruptList[5] = true end   --暴击
+		if ST_InterruptList[6] == nil then ST_InterruptList[6] = true end   --急速
+		if ST_InterruptList[7] == nil then ST_InterruptList[7] = true end   --精通
+		if ST_InterruptList[8] == nil then ST_InterruptList[8] = false end   --全能
+		if ST_InterruptList[9] == nil then ST_InterruptList[9] = false end   --吸血
+		if ST_InterruptList[10] == nil then ST_InterruptList[10] = false end   --躲闪
+		if ST_InterruptList[11] == nil then ST_InterruptList[11] = false end   --招架
+		if ST_InterruptList[12] == nil then ST_InterruptList[12] = false end   --格挡
+		
+	end
+end)
+-- 添加设置界面
+local ST_Options = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
+ST_Options:Hide()
+ST_Options.name = "ShowChance"
+ST_Options:SetScript("OnShow", function(self)
+	if self.show then return end
+	local title = self:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	title:SetPoint("TOPLEFT", 16, -16)
+	title:SetText(ST_SETTINGS)
+	
+	local website = self:CreateFontString(nil, "ARTWORK")
+	website:SetFont(GameFontNormal:GetFont(), 12)
+	website:SetWidth(500)
+	website:SetPoint("BOTTOMLEFT", 32, 32)
+	website:SetJustifyH("LEFT")
+	website:SetText("|cff298F00GitHub:|r:https://github.com/janyroo/ShowChance")
+	
+	local thanksto = self:CreateFontString(nil, "ARTWORK")
+	thanksto:SetFont(GameFontNormal:GetFont(), 20)
+	thanksto:SetWidth(500)
+	thanksto:SetPoint("BOTTOMLEFT", website, "TOPLEFT", 0, 8)
+	thanksto:SetJustifyH("LEFT")
+	thanksto:SetText("修改字体大小方法：在聊天框输入例如/sc 30\n|r提示：字体大小默认是20，/sc 字体大小可能随便填")	
+	
+	local count,countx=0,0
+	for key,value in pairs(ST_InterruptList) do
+		count=count+1
+		if count>12 then countx,count=countx+1,0 end
+		local button = CreateFrame("CheckButton", "ST_Buff_"..key, ST_Options, "InterfaceOptionsCheckButtonTemplate")
+		button:SetPoint("TOPLEFT", 32+150*countx, -32-32*count)
+		getglobal(button:GetName().."Text"):SetText(key)
+		--print(getglobal(button:GetName().."Text"))
+		if value == true then button:SetChecked(true) else button:SetChecked(false) end
+	end	
+	
+	self.show = true
+	ST_Options:SetScript("OnHide", function(self)
+		for key,value in pairs(ST_InterruptList) do
+			if _G["ST_Buff_"..key]:GetChecked() then
+				if ST_InterruptList[(key)] ~= true then
+					ST_InterruptList[(key)] = true
+					print("设置: "..key.."打开")
+				end
+			else
+				if ST_InterruptList[(key)] ~= false then
+					ST_InterruptList[(key)] = false
+					print("设置: "..key.."关闭")
+				end
+			end
+		end
+	end)
+end)
+
+
+
+InterfaceOptions_AddCategory(ST_Options)
+
+
 ShowChance_UpdateInterval = 1.0; -- how often to update the info
 
 -- init variables
@@ -94,103 +214,154 @@ function ShowChance_OnUpdate(self, elapsed)
 			janyRecordHigh = {[1] = 0, [2] = 0, [3] = 0, [4] = 0, [5] = 0}
 		end
 		if(LD_iCurrent3 == 28) then
-			N =UnitName("player")
-			IL_C = {GetAverageItemLevel()}
-			IL = "物品等级"..string.format("%.1f", IL_C[2])		--	物品等级
-					
-			S_C = UnitStat("player",1)							-- 力量
-			AG_C = UnitStat("player",2)							-- 敏捷
-			IN_C = UnitStat("player",4)							-- 智力
-			if S_C > AG_C and S_C > IN_C then
-				if (S_C> janyRecordHigh[1]) then
-					janyRecordHigh[1] = S_C;
-					janycoloredText[1] = "|cFF00FF00";
-				elseif (S_C< janyRecordHigh[1]) then
-					janyRecordHigh[1] = S_C;
-					janycoloredText[1] = "|cFFFF0000";
-				else
-					janyRecordHigh[1] = S_C;
-					janycoloredText[1] = "";
-				end
-				S = "力量"..janycoloredText[1]..S_C
-			elseif AG_C > S_C and AG_C > IN_C then
-				if (AG_C> janyRecordHigh[1]) then
-					janyRecordHigh[1] = AG_C;
-					janycoloredText[1] = "|cFF00FF00";
-				elseif (AG_C< janyRecordHigh[1]) then
-					janyRecordHigh[1] = AG_C;
-					janycoloredText[1] = "|cFFFF0000";
-				else
-					janyRecordHigh[1] = AG_C;
-					janycoloredText[1] = "";
-				end
-				S = "敏捷"..janycoloredText[1]..AG_C
-			elseif IN_C > S_C and IN_C > AG_C then
-				if (IN_C> janyRecordHigh[1]) then
-					janyRecordHigh[1] = IN_C;
-					janycoloredText[1] = "|cFF00FF00";
-				elseif (IN_C< janyRecordHigh[1]) then
-					janyRecordHigh[1] = IN_C;
-					janycoloredText[1] = "|cFFFF0000";
-				else
-					janyRecordHigh[1] = IN_C;
-					janycoloredText[1] = "";
-				end
-				S = "智力"..janycoloredText[1]..IN_C
-			end
-			A_C = {UnitArmor("player")}
-			if (A_C[2]> janyRecordHigh[2]) then
-				janyRecordHigh[2] = A_C[2];
-				janycoloredText[2] = "|cFF00FF00";
-			elseif (A_C[2]< janyRecordHigh[2]) then
-				janyRecordHigh[2] = A_C[2];
-				janycoloredText[2] = "|cFFFF0000";
+			if ST_InterruptList[1] then
+				N =UnitName("player").."\n|r"
 			else
-				janyRecordHigh[2] = A_C[2];
-				janycoloredText[2] = "";
+				N =""
 			end
-			A = "护甲"..janycoloredText[2]..A_C[2]
+			
+			if ST_InterruptList[2] then
+				IL_C = {GetAverageItemLevel()}
+				IL = "物品等级"..string.format("%.1f", IL_C[2]).."\n|r"		--	物品等级
+			else
+				IL = ""
+			end	
 
-			if (GetCritChance()> janyRecordHigh[3]) then
-				janyRecordHigh[3] = GetCritChance();
-				janycoloredText[3] = "|cFF00FF00";
-			elseif (GetCritChance()< janyRecordHigh[3]) then
-				janyRecordHigh[3] = GetCritChance();
-				janycoloredText[3] = "|cFFFF0000";
+			if ST_InterruptList[3] then	
+				S_C = UnitStat("player",1)							-- 力量
+				AG_C = UnitStat("player",2)							-- 敏捷
+				IN_C = UnitStat("player",4)							-- 智力
+				if S_C > AG_C and S_C > IN_C then
+					if (S_C> janyRecordHigh[1]) then
+						janyRecordHigh[1] = S_C;
+						janycoloredText[1] = "|cFF00FF00";
+					elseif (S_C< janyRecordHigh[1]) then
+						janyRecordHigh[1] = S_C;
+						janycoloredText[1] = "|cFFFF0000";
+					else
+						janyRecordHigh[1] = S_C;
+						janycoloredText[1] = "";
+					end
+					S = "力量"..janycoloredText[1]..S_C.."\n|r"
+				elseif AG_C > S_C and AG_C > IN_C then
+					if (AG_C> janyRecordHigh[1]) then
+						janyRecordHigh[1] = AG_C;
+						janycoloredText[1] = "|cFF00FF00";
+					elseif (AG_C< janyRecordHigh[1]) then
+						janyRecordHigh[1] = AG_C;
+						janycoloredText[1] = "|cFFFF0000";
+					else
+						janyRecordHigh[1] = AG_C;
+						janycoloredText[1] = "";
+					end
+					S = "敏捷"..janycoloredText[1]..AG_C.."\n|r"
+				elseif IN_C > S_C and IN_C > AG_C then
+					if (IN_C> janyRecordHigh[1]) then
+						janyRecordHigh[1] = IN_C;
+						janycoloredText[1] = "|cFF00FF00";
+					elseif (IN_C< janyRecordHigh[1]) then
+						janyRecordHigh[1] = IN_C;
+						janycoloredText[1] = "|cFFFF0000";
+					else
+						janyRecordHigh[1] = IN_C;
+						janycoloredText[1] = "";
+					end
+					S = "智力"..janycoloredText[1]..IN_C.."\n|r"
+				end
 			else
-				janyRecordHigh[3] = GetCritChance();
-				janycoloredText[3] = "";
+				S = ""
 			end
-			CC = "暴击"..janycoloredText[3]..string.format("%.1f", GetCritChance()).."%"			--	暴击
+			if ST_InterruptList[4] then	
+				A_C = {UnitArmor("player")}
+				if (A_C[2]> janyRecordHigh[2]) then
+					janyRecordHigh[2] = A_C[2];
+					janycoloredText[2] = "|cFF00FF00";
+				elseif (A_C[2]< janyRecordHigh[2]) then
+					janyRecordHigh[2] = A_C[2];
+					janycoloredText[2] = "|cFFFF0000";
+				else
+					janyRecordHigh[2] = A_C[2];
+					janycoloredText[2] = "";
+				end
+				A = "护甲"..janycoloredText[2]..A_C[2].."\n|r"
+			else
+				A = ""
+			end
+			
 
+			if ST_InterruptList[5] then 
+				if (GetCritChance()> janyRecordHigh[3]) then
+					janyRecordHigh[3] = GetCritChance();
+					janycoloredText[3] = "|cFF00FF00";
+				elseif (GetCritChance()< janyRecordHigh[3]) then
+					janyRecordHigh[3] = GetCritChance();
+					janycoloredText[3] = "|cFFFF0000";
+				else
+					janyRecordHigh[3] = GetCritChance();
+					janycoloredText[3] = "";
+				end
+				CC = "暴击"..janycoloredText[3]..string.format("%.1f", GetCritChance()).."%\n|r" 
+			else
+				CC =""
+			end
 
-			if (GetHaste()> janyRecordHigh[4]) then
-				janyRecordHigh[4] = GetHaste();
-				janycoloredText[4] = "|cFF00FF00";
-			elseif (GetHaste()< janyRecordHigh[4]) then
-				janyRecordHigh[4] = GetHaste();
-				janycoloredText[4] = "|cFFFF0000";
+			if ST_InterruptList[6] then
+				if (GetHaste()> janyRecordHigh[4]) then
+					janyRecordHigh[4] = GetHaste();
+					janycoloredText[4] = "|cFF00FF00";
+				elseif (GetHaste()< janyRecordHigh[4]) then
+					janyRecordHigh[4] = GetHaste();
+					janycoloredText[4] = "|cFFFF0000";
+				else
+					janyRecordHigh[4] = GetHaste();
+					janycoloredText[4] = "";
+				end
+				H = "急速"..janycoloredText[4]..string.format("%.1f", GetHaste()).."%\n|r" --	 急速
 			else
-				janyRecordHigh[4] = GetHaste();
-				janycoloredText[4] = "";
+				H = ""
 			end
-			H = "急速"..janycoloredText[4]..string.format("%.1f", GetHaste()).."%"--	 急速
-			if (GetMasteryEffect()> janyRecordHigh[5]) then
-				janyRecordHigh[5] = GetMasteryEffect();
-				janycoloredText[5] = "|cFF00FF00";
-			elseif (GetMasteryEffect()< janyRecordHigh[5]) then
-				janyRecordHigh[5] = GetMasteryEffect();
-				janycoloredText[5] = "|cFFFF0000";
+			if ST_InterruptList[7] then
+				if (GetMasteryEffect()> janyRecordHigh[5]) then
+					janyRecordHigh[5] = GetMasteryEffect();
+					janycoloredText[5] = "|cFF00FF00";
+				elseif (GetMasteryEffect()< janyRecordHigh[5]) then
+					janyRecordHigh[5] = GetMasteryEffect();
+					janycoloredText[5] = "|cFFFF0000";
+				else
+					janyRecordHigh[5] = GetMasteryEffect();
+					janycoloredText[5] = "";
+				end
+				M = "精通"..janycoloredText[5]..string.format("%.1f", GetMasteryEffect()).."%\n|r" --	 精通
 			else
-				janyRecordHigh[5] = GetMasteryEffect();
-				janycoloredText[5] = "";
+				M = ""
 			end
-			M = "精通"..janycoloredText[5]..string.format("%.1f", GetMasteryEffect()).."%"--	 精通
-			V  = " 全能"..string.format("%.1f", GetCombatRatingBonus(29)).."%"			-- 全能
-			LS  = " 吸血"..string.format("%.1f", GetCombatRatingBonus(17)).."%"			-- 吸血	
-			DC = " 躲闪"..string.format("%.1f", GetDodgeChance()).."%"		--	躲闪
-			PC = " 招架"..string.format("%.1f", GetParryChance()).."%"			--	招架
-			BC = " 格挡"..string.format("%.1f", GetBlockChance()).."%"			-- 格挡	
+				
+			if ST_InterruptList[8] then
+				V  = " 全能"..string.format("%.1f", GetCombatRatingBonus(29)).."%\n|r"			-- 全能
+			else
+				V = ""
+			end
+			if ST_InterruptList[9] then
+				LS  = " 吸血"..string.format("%.1f", GetCombatRatingBonus(17)).."%\n|r"			-- 吸血	
+			else
+				LS =""
+			end
+			if ST_InterruptList[10] then
+				DC = " 躲闪"..string.format("%.1f", GetDodgeChance()).."%\n|r"		--	躲闪
+			else
+				DC = ""
+			end
+			if ST_InterruptList[11] then
+				PC = " 招架"..string.format("%.1f", GetParryChance()).."%\n|r"		--	招架
+			else
+				PC =""
+			end
+
+			if ST_InterruptList[12] then
+				BC = " 格挡"..string.format("%.1f", GetBlockChance()).."%"			-- 格挡	
+			else
+				BC = ""
+			end
 			--print(N..IL..S..A..CC..H..M..V..LS..DC..PC..BC)
 		end		
 
@@ -252,7 +423,8 @@ function ShowChance_OnUpdate(self, elapsed)
 		
 		-- actual output
 		--ShowChance_FrameText:SetText(line1forOutput.."\n|r"..skillTable[LD_iCurrent]..": "..comma_value(line2text).."\n|r"..skillTable[LD_iCurrent3]..": "..line3text.."%");
-		ShowChance_FrameText:SetText(N.."\n|r"..IL.."\n|r"..S.."\n|r"..A.."\n|r"..CC.."\n|r"..H.."\n|r"..M.."\n|r"..V.."\n|r"..LS.."\n|r"..DC.."\n|r"..PC.."\n|r"..BC);
+		ShowChance_FrameText:SetFont(GameFontNormal:GetFont(), SFF)
+		ShowChance_FrameText:SetText(N..IL..S..A..CC..H..M..V..LS..DC..PC..BC);
 		-- reset update counter
 		self.TimeSinceLastUpdate = 0;
 	end --end if updating
@@ -308,10 +480,18 @@ end
 SLASH_ShowChance1, SLASH_ShowChance1 = "/sc", "/ShowChance";
 SlashCmdList["ShowChance"] = function(msg, editBox)
 --	InterfaceOptionsFrame_OpenToCategory("ShowChance");
-	showHighScore();
-	print("showHighScore")
+	--showHighScore();
+		hendlers(msg)
 end
 
+function hendlers(msg, ... )--命令行
+	msg=msg:lower()
+	local command, rest = msg:match("^(%S*)%s*(.-)$")
+	if command == msg then
+		SFF = msg
+		ShowChance_FrameText:SetFont(GameFontNormal:GetFont(), SFF)
+	end
+end
 ---============================================================
 -- rounds a number to the nearest decimal places
 --
@@ -338,4 +518,3 @@ end
 
 
 
--- EOF --

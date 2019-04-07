@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\..\FrameXML\UI.xsd">
 	<Frame name="ShowChance_Frame" parent="UIParent" enableMouse="true" movable="true">
-		<Size x="130" y="200" />
+		<Size x="130" y="130" />
 		<Anchors>
 			<Anchor point="CENTER" />
 		</Anchors>
@@ -9,7 +9,7 @@
 			<Layer level="ARTWORK">
 				<FontString name="$parentText" inherits="GameFontNormal" />
 				<Texture setAllPoints="true">
-					<Color r="0.0" g="0.0" b="0.0" a="0.05" />
+					<Color r="0.0" g="0.0" b="0.0" a="0.01" />
 				</Texture>
 			</Layer>
 		</Layers>
