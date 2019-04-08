@@ -1,53 +1,15 @@
 local ShowChance = CreateFrame("Frame")
 -- 首次登陆加载
-local SFF = 20
+
 local ShowChance_Load = CreateFrame("Frame")
 ShowChance_Load:RegisterEvent("ADDON_LOADED")
 ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 	if event == "ADDON_LOADED" and addon == "ShowChance" then
-
-		if ST_BuffList == nil then ST_BuffList = {} end
-    	--BUFF
-		if ST_BuffList[1459] == nil then ST_BuffList[1459] = true end -- FS [奥术光辉]
-		if ST_BuffList[633] == nil then ST_BuffList[633] = true end       -- SQ [圣疗术 633]   25771
-		if ST_BuffList[203538] == nil then ST_BuffList[203538] = true end -- SQ [强效王者祝福]
-		if ST_BuffList[203539] == nil then ST_BuffList[203539] = true end -- SQ [强效智慧祝福]
-		if ST_BuffList[546] == nil then ST_BuffList[546] = true end     --SM [水上行走] 		
-		if ST_BuffList[61295] == nil then ST_BuffList[61295] = true end --SM [激流]	
-		if ST_BuffList[8936] == nil then ST_BuffList[8936] = true end     -- XD [愈合]	
-		if ST_BuffList[774] == nil then ST_BuffList[774] = true end       -- XD [回春术]		
-		if ST_BuffList[102342] == nil then ST_BuffList[102342] = true end --XD [铁木树皮]	
-		if ST_BuffList[33763] == nil then ST_BuffList[33763] = true end   -- XD [生命绽放]	
-		if ST_BuffList[5697] == nil then ST_BuffList[5697] = true end -- SS [无尽呼吸]	
-		if ST_BuffList[116841] == nil then ST_BuffList[116841] = true end --WS [迅如猛虎]
-		if ST_BuffList[124682] == nil then ST_BuffList[124682] = true end --WS [氤氲之雾]
-		if ST_BuffList[116849] == nil then ST_BuffList[116849] = true end --WS [作茧缚命]
-		if ST_BuffList[115151] == nil then ST_BuffList[115151] = true end --WS [复苏之雾]
-		if ST_BuffList[115175] == nil then ST_BuffList[115175] = true end --WS [抚慰之雾]
-		if ST_BuffList[121536] == nil then ST_BuffList[121536] = true end    -- MS [天堂之羽]
-		if ST_BuffList[186263] == nil then ST_BuffList[186263] = true end    --MS [暗影愈合]
-		if ST_BuffList[33206] == nil then ST_BuffList[33206] = true end      --MS [痛苦压制]
-		if ST_BuffList[17] == nil then ST_BuffList[17] = true end            --MS [真言术：盾]
-		if ST_BuffList[194509] == nil then ST_BuffList[194509] = true end    --MS[真言术：耀]
-		if ST_BuffList[62618] == nil then ST_BuffList[62618] = true end      --MS[真言术：障]
-		if ST_BuffList[21562] == nil then ST_BuffList[21562] = true end      --MS[真言术：韧] 
-
-    	--驱散
-		if ST_BuffList[51886] == nil then ST_BuffList[51886] = true end   -- SM 净化灵魂	
-		if ST_BuffList[88423] == nil then ST_BuffList[88423] = true end   -- XD [自然之愈]		
-		if ST_BuffList[213644] == nil then ST_BuffList[213644] = true end -- SQ [清毒术]		
-		if ST_BuffList[475] == nil then ST_BuffList[475] = true end       -- FS [解除诅咒]	
-		if ST_BuffList[119905] == nil then ST_BuffList[119905] = true end -- SS [烧灼驱魔]	
-		if ST_BuffList[218164] == nil then ST_BuffList[218164] = true end --WS [清创生血]
-		if ST_BuffList[527] == nil then ST_BuffList[527] = true end       --MS [纯净术]
-		if ST_BuffList[32375] == nil then ST_BuffList[32375] = true end   --MS [群体驱散]
-
-		--打断
-
+		if SFF == nil then SFF = 20 end 
 		if ST_InterruptList == nil then ST_InterruptList = {} end
 		if ST_InterruptList[1] == nil then ST_InterruptList[1] = false end   --玩家名称
 		if ST_InterruptList[2] == nil then ST_InterruptList[2] = false end   --装等
-		if ST_InterruptList[3] == nil then ST_InterruptList[3] = true end   --力量
+		if ST_InterruptList[3] == nil then ST_InterruptList[3] = true end   --主属性
 		if ST_InterruptList[4] == nil then ST_InterruptList[4] = true end   --护甲
 		if ST_InterruptList[5] == nil then ST_InterruptList[5] = true end   --暴击
 		if ST_InterruptList[6] == nil then ST_InterruptList[6] = true end   --急速
@@ -62,7 +24,7 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_TextList == nil then ST_TextList = {} end
 		if ST_TextList[1] == nil then ST_TextList[1] = "玩家名称" end   --玩家名称
 		if ST_TextList[2] == nil then ST_TextList[2] = "装等" end   --装等
-		if ST_TextList[3] == nil then ST_TextList[3] = "主属性" end   --力量
+		if ST_TextList[3] == nil then ST_TextList[3] = "主属性" end   --主属性
 		if ST_TextList[4] == nil then ST_TextList[4] = "护甲" end   --护甲
 		if ST_TextList[5] == nil then ST_TextList[5] = "暴击" end   --暴击
 		if ST_TextList[6] == nil then ST_TextList[6] = "急速" end   --急速
@@ -97,7 +59,7 @@ ST_Options:SetScript("OnShow", function(self)
 	thanksto:SetWidth(500)
 	thanksto:SetPoint("BOTTOMLEFT", website, "TOPLEFT", 0, 8)
 	thanksto:SetJustifyH("LEFT")
-	thanksto:SetText("修改字体大小方法：在聊天框输入例如/sc 30\n|r提示：字体大小默认是20，/sc 字体大小可以随便填")	
+	thanksto:SetText("修改字体大小方法：在聊天框输入例如/sc 30\n|r提示：字体大小默认是20，/sc 字体大小可能随便填")	
 	
 	local count,countx=0,0
 	for key,value in pairs(ST_InterruptList) do
