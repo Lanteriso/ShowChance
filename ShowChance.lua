@@ -6,6 +6,13 @@ ShowChance_Load:RegisterEvent("ADDON_LOADED")
 ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 	if event == "ADDON_LOADED" and addon == "ShowChance" then
 		if SFF == nil then SFF = 20 end 
+
+		--设置开关
+		if ST_Lock == nil then ST_Lock = false end --锁
+		
+
+		
+
 		if ST_InterruptList == nil then ST_InterruptList = {} end
 		if ST_InterruptList[1] == nil then ST_InterruptList[1] = false end   --玩家名称
 		if ST_InterruptList[2] == nil then ST_InterruptList[2] = false end   --装等
@@ -34,7 +41,7 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_TextList[10] == nil then ST_TextList[10] = "躲闪" end   --躲闪
 		if ST_TextList[11] == nil then ST_TextList[11] = "招架" end   --招架
 		if ST_TextList[12] == nil then ST_TextList[12] = "格挡" end   --格挡
-		
+
 	end
 end)
 -- 添加设置界面
@@ -60,12 +67,23 @@ ST_Options:SetScript("OnShow", function(self)
 	thanksto:SetPoint("BOTTOMLEFT", website, "TOPLEFT", 0, 8)
 	thanksto:SetJustifyH("LEFT")
 	thanksto:SetText("修改字体大小方法：在聊天框输入例如/sc 30\n|r提示：字体大小默认是20，/sc 字体大小可能随便填")	
+
+	local lockframes = CreateFrame("CheckButton", "ST_Locks", ST_Options, "InterfaceOptionsCheckButtonTemplate")
+	lockframes:SetPoint("TOPRIGHT", -132, -52)
+	getglobal(lockframes:GetName().."Text"):SetText("开关")
+	if ST_Lock == true then 
+		lockframes:SetChecked(true) 
+	else 
+		lockframes:SetChecked(false)
+
+	end
 	
+
 	local count,countx=0,0
 	for key,value in pairs(ST_InterruptList) do
 		count=count+1
 		if count>12 then countx,count=countx+1,0 end
-		local button = CreateFrame("CheckButton", "ST_Buff_"..key, ST_Options, "InterfaceOptionsCheckButtonTemplate")
+		local button = CreateFrame("CheckButton", "ST_InterruptList_"..key, ST_Options, "InterfaceOptionsCheckButtonTemplate")
 		button:SetPoint("TOPLEFT", 32+150*countx, -32-32*count)
 		getglobal(button:GetName().."Text"):SetText(ST_TextList[key])
 		--print(getglobal(button:GetName().."Text"))
@@ -74,11 +92,44 @@ ST_Options:SetScript("OnShow", function(self)
 	
 	self.show = true
 	ST_Options:SetScript("OnHide", function(self)
+		if _G["ST_Locks"]:GetChecked() then
+			if ST_Lock ~= true then
+				
+
+				print("设置: 现在可移动框体")
+
+				
+                   			ShowChance_Frame:SetSize(100,100)
+                            ShowChance_Frame:EnableMouse(true)
+                            ShowChance_Frame:SetMovable(true)
+                            ST_Lock = true
+
+				
+			end
+		else
+
+			if ST_Lock ~= false then
+				
+
+				print("设置: 现在不可移动框体")
+				
+							ShowChance_Frame:SetSize(1,1)
+                            ShowChance_Frame:EnableMouse(true)
+                            ShowChance_Frame:SetMovable(true)
+                            ST_Lock = false
+
+
+                  
+				
+			end
+		end
+
 		for key,value in pairs(ST_InterruptList) do
-			if _G["ST_Buff_"..key]:GetChecked() then
+			if _G["ST_InterruptList_"..key]:GetChecked() then
 				if ST_InterruptList[(key)] ~= true then
 					ST_InterruptList[(key)] = true
 					print("设置: "..key.."打开")
+					
 				end
 			else
 				if ST_InterruptList[(key)] ~= false then
@@ -152,7 +203,8 @@ skillTable = {
 
 -- OnLoad event
 function ShowChance_OnLoad()
-  ChatFrame1:AddMessage("+ |cFFFF0000ShowChance已开启,祝你天天泰坦.");
+  ChatFrame1:AddMessage("|cFFFF0000【ShowChance】属性显示已开启,祝你波波有爆发,天天出泰坦.");
+
 end
 
 -- Config Panel Code
@@ -180,6 +232,7 @@ ShowChance:SetScript("OnEvent", function (self,event)
 	elseif event == "PLAYER_REGEN_DISABLED" then
 		ShowChance_UpdateInterval = 1.0
 		UIFrameFadeOut(ShowChance_FrameText, 2, 0.5, 1)--淡入
+				
 	end	
 end);
 
@@ -330,6 +383,7 @@ function ShowChance_OnUpdate(self, elapsed,event)
 			end
 			if ST_InterruptList[9] then
 				LS  = "吸血 |cFFFFFFFF"..string.format("%.1f", GetCombatRatingBonus(17)).."%\n|r"			-- 吸血	
+
 			else
 				LS =""
 			end
@@ -349,7 +403,7 @@ function ShowChance_OnUpdate(self, elapsed,event)
 			else
 				BC = ""
 			end
-			--print(N..IL..S..A..CC..H..M..V..LS..DC..PC..BC)
+
 		end		
 
 	
@@ -411,7 +465,7 @@ function ShowChance_OnUpdate(self, elapsed,event)
 		-- actual output
 		--ShowChance_FrameText:SetText(line1forOutput.."\n|r"..skillTable[LD_iCurrent]..": "..comma_value(line2text).."\n|r"..skillTable[LD_iCurrent3]..": "..line3text.."%");
 
-		
+
 		ShowChance_FrameText:SetJustifyH("LEFT")
 		ShowChance_FrameText:SetFont(GameFontNormal:GetFont(), SFF)
 		ShowChance_FrameText:SetText(N..IL..S..A..CC..H..M..V..LS..DC..PC..BC);
@@ -471,7 +525,8 @@ SLASH_ShowChance1, SLASH_ShowChance1 = "/sc", "/ShowChance";
 SlashCmdList["ShowChance"] = function(msg, editBox)
 --	InterfaceOptionsFrame_OpenToCategory("ShowChance");
 	--showHighScore();
-		hendlers(msg)
+		hendlers(msg);
+		
 end
 
 function hendlers(msg, ... )--命令行
@@ -480,6 +535,15 @@ function hendlers(msg, ... )--命令行
 	if command == msg then
 		SFF = msg
 		ShowChance_FrameText:SetFont(GameFontNormal:GetFont(), SFF)
+        print("大小"..SFF)
+	elseif command=="lock" then
+
+        print("锁定框体")
+	elseif command=="unlock" then
+
+        print("解锁框体")
+    else
+    	print("/sc 数字\n|r","/sc lock\n|r","/sc unlock")
 	end
 end
 ---============================================================
