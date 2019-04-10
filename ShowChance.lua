@@ -26,6 +26,7 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_InterruptList[10] == nil then ST_InterruptList[10] = false end   --躲闪
 		if ST_InterruptList[11] == nil then ST_InterruptList[11] = false end   --招架
 		if ST_InterruptList[12] == nil then ST_InterruptList[12] = false end   --格挡
+		if ST_InterruptList[13] == nil then ST_InterruptList[13] = true end   --移动速度
 
 
 		if ST_TextList == nil then ST_TextList = {} end
@@ -41,6 +42,7 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_TextList[10] == nil then ST_TextList[10] = "躲闪" end   --躲闪
 		if ST_TextList[11] == nil then ST_TextList[11] = "招架" end   --招架
 		if ST_TextList[12] == nil then ST_TextList[12] = "格挡" end   --格挡
+		if ST_TextList[13] == nil then ST_TextList[13] = "移动速度" end --移动速度
 
 	end
 end)
@@ -227,10 +229,10 @@ ShowChance:RegisterEvent("PLAYER_REGEN_DISABLED")
 ShowChance:RegisterEvent("PLAYER_REGEN_ENABLED")   
 ShowChance:SetScript("OnEvent", function (self,event)
 	if event == "PLAYER_REGEN_ENABLED" then
-		ShowChance_UpdateInterval = 5.0
+		ShowChance_UpdateInterval = 1.0--没进战斗刷新频率
 		UIFrameFadeOut(ShowChance_FrameText, 2, 1, 0.5)--淡入
 	elseif event == "PLAYER_REGEN_DISABLED" then
-		ShowChance_UpdateInterval = 1.0
+		ShowChance_UpdateInterval = 1.0--进战斗刷新频率
 		UIFrameFadeOut(ShowChance_FrameText, 2, 0.5, 1)--淡入
 				
 	end	
@@ -251,7 +253,7 @@ function ShowChance_OnUpdate(self, elapsed,event)
 		--jany3
 		janycoloredText={};
 		if not janyRecordHigh then
-			janyRecordHigh = {[1] = 0, [2] = 0, [3] = 0, [4] = 0, [5] = 0}
+			janyRecordHigh = {[1] = 0, [2] = 0, [3] = 0, [4] = 0, [5] = 0, [6] = 0}
 		end
 		if(LD_iCurrent3 == 28) then
 			if ST_InterruptList[1] then
@@ -402,6 +404,22 @@ function ShowChance_OnUpdate(self, elapsed,event)
 				BC = "格挡 |cFFFFFFFF"..string.format("%.1f", GetBlockChance()).."%"			-- 格挡	
 			else
 				BC = ""
+			end
+
+			if ST_InterruptList[13] then
+				if (GetUnitSpeed("player",1)> janyRecordHigh[6]) then
+					janyRecordHigh[6] = GetUnitSpeed("player",1);
+					janycoloredText[6] = "|cFF00FF00";
+				elseif (GetUnitSpeed("player",1)< janyRecordHigh[6]) then
+					janyRecordHigh[6] = GetUnitSpeed("player",1);
+					janycoloredText[6] = "|cFFFF0000";
+				else
+					janyRecordHigh[6] = GetUnitSpeed("player",1);
+					janycoloredText[6] = "|cFFFFFFFF";
+				end
+				M = "移速 "..janycoloredText[6]..string.format("%.1f", GetUnitSpeed("player",1)).."码/秒\n|r" --移动速度
+			else
+				M = ""
 			end
 
 		end		
@@ -572,4 +590,3 @@ end
 
 
 UIFrameFadeOut(ShowChance_FrameText, 1, 0.2, 0.8)
-
