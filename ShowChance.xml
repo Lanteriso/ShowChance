@@ -3,7 +3,7 @@
 	<Frame name="ShowChance_Frame" parent="UIParent" enableMouse="true" movable="true">
 		<Size x="1" y="1" />
 		<Anchors>
-			<Anchor point="CENTER" />
+			<Anchor point="CENTER" x="-300" y="-300" />
 		</Anchors>
 		<Layers>
 			<Layer level="ARTWORK">

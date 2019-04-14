@@ -9,7 +9,7 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if SFF == nil then SFF = 20 end 
 
 		--设置开关
-		if ST_Lock == nil then ST_Lock = false end --锁
+		if ST_Lock == nil then ST_Lock = false end --锁-
 		
 
 		
@@ -22,6 +22,9 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_InterruptLists["HP"] == nil then ST_InterruptLists["HP"] = false end--血
 		if ST_InterruptLists["MP"] == nil then ST_InterruptLists["MP"] = false end--蓝
 		if ST_InterruptLists["CB"] == nil then ST_InterruptLists["CB"] = false end--连击点
+		if ST_InterruptLists["法力回复"] == nil then ST_InterruptLists["法力回复"] = false end--法力回复
+		if ST_InterruptLists["伤害"] == nil then ST_InterruptLists["伤害"] = false end--伤害
+		if ST_InterruptLists["武器伤害"] == nil then ST_InterruptLists["武器伤害"] = false end--武器伤害
 		if ST_InterruptLists["攻强"] == nil then ST_InterruptLists["攻强"] = false end--攻强
 		if ST_InterruptLists["主属性"] == nil then ST_InterruptLists["主属性"] = true end   --主属性
 		if ST_InterruptLists["护甲"] == nil then ST_InterruptLists["护甲"] = true end   --护甲
@@ -33,8 +36,13 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_InterruptLists["躲闪"] == nil then ST_InterruptLists["躲闪"] = false end   --躲闪
 		if ST_InterruptLists["招架"] == nil then ST_InterruptLists["招架"] = false end   --招架
 		if ST_InterruptLists["格挡"] == nil then ST_InterruptLists["格挡"] = false end   --格挡
+		if ST_InterruptLists["移动速度"] == nil then ST_InterruptLists["移动速度"] = false end   --移动速度%
 		if ST_InterruptLists["移速"] == nil then ST_InterruptLists["移速"] = true end   --移动速度
 		if ST_InterruptLists["攻速"] == nil then ST_InterruptLists["攻速"] = true end   --攻击速度
+		if ST_InterruptLists["GCD"] == nil then ST_InterruptLists["GCD"] = true end   --GCD
+		if ST_InterruptLists["FPS"] == nil then ST_InterruptLists["FPS"] = true end   --FPS
+		if ST_InterruptLists["延迟"] == nil then ST_InterruptLists["延迟"] = true end   --延迟
+		if ST_InterruptLists["钱"] == nil then ST_InterruptLists["钱"] = false end   --钱
 
 		--[[
 		if ST_TextList == nil then ST_TextList = {} end
@@ -85,7 +93,7 @@ ST_Options:SetScript("OnShow", function(self)
 
 	local lockframes = CreateFrame("CheckButton", "ST_Locks", ST_Options, "InterfaceOptionsCheckButtonTemplate")
 	lockframes:SetPoint("TOPRIGHT", -132, -52)
-	getglobal(lockframes:GetName().."Text"):SetText("开关")
+	getglobal(lockframes:GetName().."Text"):SetText("解锁开关")
 	if ST_Lock == true then 
 		lockframes:SetChecked(true) 
 	else 
@@ -272,6 +280,7 @@ local function GetAzeriteLevel()--项链等级
 	return level
 end	
 function ShowChance_GetColor(janydatacontrast,janyserialnumber)
+
 	if janycoloredText[janyserialnumber] == nil then janycoloredText[janyserialnumber]="|cFFFFFFFF" end
 
 	if janyRecordHigh[janyserialnumber] then
@@ -292,6 +301,72 @@ function ShowChance_GetColor(janydatacontrast,janyserialnumber)
 	return janycoloredText[janyserialnumber]
 end
 
+local function mystrangefunction()
+	local level = UnitLevel("player")--等级
+	local health = UnitHealthMax("player")--血-
+	local power = UnitPowerMax("player") or 0--最大法力值
+	local Strength = UnitStat("player", 1)
+	local Agility = UnitStat("player", 2)
+	local Stamina = UnitStat("player", 3)
+	local Intellect = UnitStat("player", 4)
+	local Spirit = floor( ( ((health + power)/level)  +  (Intellect + Strength) ) / 3  )
+	local _ , Armor = UnitArmor("player");--护甲
+	local NewCharacterLevelText = level
+	local classDisplayName, class = UnitClass("player");
+	local race = UnitRace("player");--天赋
+	
+	if (NewCharacterLevelText > 59) then
+		NewCharacterLevelText = 60
+	end
+	
+
+	
+	-- Calculations based on my Classic character with max resists as a bear tank. Image is here: https://i.imgur.com/WcAzViA.jpg
+	local FrostRes = floor( (health / (Armor + Strength)) * 2.3)
+	local FireRes = floor( (health / (Armor + Agility) * 4.7))
+	local NatureRes = floor( (health / (Armor + Stamina) * 3.4))
+	local ArcaneRes = floor( (health / (Armor + Intellect) * 1))
+	local ShadowRes = floor( (health / (Armor + Spirit) * 1.4))
+	--print(health, Armor, Strength, Agility, Stamina, Intellect, FrostRes, FireRes, NatureRes, ArcaneRes, ShadowRes)
+
+	--GCD
+	local haste = GetHaste()
+	local gcd = max(0.75, 1.5 * 100 / (100+haste))
+
+	--回蓝
+	base, casting = GetManaRegen()
+	print(base*5, casting*5)--每5秒回蓝
+end
+
+--武器自动攻击(白字)每秒伤害
+local function JanyJustGetDamage(unit)
+	local function JustGetDamage(unit)
+		if IsRangedWeapon() then
+			local attackTime, minDamage, maxDamage = UnitRangedDamage(unit);
+			return minDamage, maxDamage, nil, nil;
+		else
+			return UnitDamage(unit);
+		end
+	end
+	local speed, offhandSpeed = UnitAttackSpeed("player");
+	local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage = JustGetDamage(unit);
+	local fullDamage = (minDamage + maxDamage)/2;
+	local white_dps = fullDamage/speed
+	local main_oh_dps = format("%.2f", white_dps)
+	local tooltip2 = "主手"
+		-- If there's an offhand speed then add the offhand info to the tooltip
+	if ( offhandSpeed and minOffHandDamage and maxOffHandDamage ) then
+		local offhandFullDamage = (minOffHandDamage + maxOffHandDamage)/2;
+		local oh_dps = offhandFullDamage/offhandSpeed
+		main_oh_dps = main_oh_dps .. "/" .. dcs_format("%.2f",oh_dps)
+		white_dps = (white_dps + oh_dps)*(1-DUAL_WIELD_HIT_PENALTY/100)
+	end
+	local misses_etc = (1+BASE_MISS_CHANCE_PHYSICAL[3]/100)*(1+BASE_ENEMY_DODGE_CHANCE[3]/100)*(1+BASE_ENEMY_PARRY_CHANCE[3]/100) -- hopefully the right formula
+	white_dps = format("%.2f",white_dps*(1 + GetCritChance()/100)/misses_etc) --assumes crits do twice as damage
+	return minDamage,maxDamage,white_dps
+end
+
+
 function ShowChance_OnUpdate(self, elapsed,event)
 
 	self.TimeSinceLastUpdate = self.TimeSinceLastUpdate + elapsed;
@@ -306,6 +381,7 @@ function ShowChance_OnUpdate(self, elapsed,event)
 	if (self.TimeSinceLastUpdate > ShowChance_UpdateInterval) then
 
 		if(LD_iCurrent3 == 28) then
+
 			if ST_InterruptLists["玩家名称"] then
 				N =UnitName("player").."\n|r"
 			else
@@ -345,6 +421,23 @@ function ShowChance_OnUpdate(self, elapsed,event)
 				CB = "CB  "..ShowChance_GetColor(UnitPower("player", 4),"CB")..UnitPower("player", 4).."\n|r" 
 			else
 				CB =""
+			end
+			if ST_InterruptLists["法力回复"] then
+				HL = "法力回复  "..ShowChance_GetColor(string.format("%.1f",GetManaRegen(2)),"法力回复")..string.format("%.1f",GetManaRegen(2)).."/s\n|r" 
+			else
+				HL =""
+			end
+			if ST_InterruptLists["伤害"] then
+				minDamage,maxDamage,white_dps = JanyJustGetDamage("player")
+				SH = "伤害  "..ShowChance_GetColor(string.format("%.2f",minDamage),"伤害")..string.format("%.2f",minDamage).." - "..string.format("%.2f",maxDamage).."\n|r" 
+			else
+				SH =""
+			end
+			if ST_InterruptLists["武器伤害"] then
+				minDamage,maxDamage,white_dps = JanyJustGetDamage("player")
+				WQSH = "武器伤害  "..ShowChance_GetColor(white_dps,"武器伤害")..white_dps.."\n|r" 
+			else
+				WQSH =""
 			end
 			if ST_InterruptLists["攻强"] then	
 				base, posBuff, negBuff = UnitAttackPower("player");
@@ -427,7 +520,11 @@ function ShowChance_OnUpdate(self, elapsed,event)
 			else
 				BC = ""
 			end
-
+			if ST_InterruptLists["移动速度"] then
+				MSS = "移速 "..ShowChance_GetColor(GetUnitSpeed("player") / 7 * 100,"移动速度")..string.format("%d%%",GetUnitSpeed("player") / 7 * 100).."\n|r" --移动速度
+			else
+				MSS = ""
+			end
 			if ST_InterruptLists["移速"] then
 				MS = "移速 "..ShowChance_GetColor(GetUnitSpeed("player",1),"移速")..string.format("%.1f", GetUnitSpeed("player",1)).."m/s\n|r" --移动速度
 			else
@@ -438,6 +535,27 @@ function ShowChance_OnUpdate(self, elapsed,event)
 				GS = "攻速 "..ShowChance_GetColor(UnitAttackSpeed("player",1),"攻速")..string.format("%.1f", UnitAttackSpeed("player",1)).."/s\n|r" --攻速
 			else
 				GS = ""
+			end
+			if ST_InterruptLists["GCD"] then
+				GCD = "GCD "..ShowChance_GetColor(max(0.75, 1.5 * 100 / (100+GetHaste())),"GCD")..string.format("%.2f",max(0.75, 1.5 * 100 / (100+GetHaste()))).."s\n|r" --GCD
+			else
+				GCD = ""
+			end
+			if ST_InterruptLists["FPS"] then
+				FPS = "FPS "..ShowChance_GetColor(floor(GetFramerate()),"FPS")..floor(GetFramerate()).."\n|r" --FPS
+			else
+				FPS = ""
+			end
+			if ST_InterruptLists["延迟"] then
+				bandwidthIn, bandwidthOut, latencyHome, latencyWorld = GetNetStats();
+				YC = "延迟 "..ShowChance_GetColor(latencyHome,"延迟")..latencyHome.." ms\n|r" --延迟
+			else
+				YC = ""
+			end
+			if ST_InterruptLists["钱"] then
+				MN = "钱 "..ShowChance_GetColor(floor(GetMoney()/10000),"钱")..floor(GetMoney()/10000).." 金\n|r" --钱
+			else
+				MN = ""floor(GetMoney()/10000)
 			end
 
 		end		
@@ -504,7 +622,7 @@ function ShowChance_OnUpdate(self, elapsed,event)
 
 		ShowChance_FrameText:SetJustifyH("LEFT")
 		ShowChance_FrameText:SetFont(GameFontNormal:GetFont(), SFF)
-		ShowChance_FrameText:SetText(N..IL..AL..TF..HP..MP..CB..GQ..S..A..CC..H..M..V..LS..DC..PC..BC..MS..GS);
+		ShowChance_FrameText:SetText(N..IL..AL..TF..HP..MP..CB..HL..SH..WQSH..GQ..S..A..CC..H..M..V..LS..DC..PC..BC..MSS..MS..GS..GCD..FPS..YC..MN);
 		-- reset update counter
 		self.TimeSinceLastUpdate = 0;
 	end --end if updating
