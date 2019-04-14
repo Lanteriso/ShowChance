@@ -358,7 +358,7 @@ local function JanyJustGetDamage(unit)
 	if ( offhandSpeed and minOffHandDamage and maxOffHandDamage ) then
 		local offhandFullDamage = (minOffHandDamage + maxOffHandDamage)/2;
 		local oh_dps = offhandFullDamage/offhandSpeed
-		main_oh_dps = main_oh_dps .. "/" .. dcs_format("%.2f",oh_dps)
+		main_oh_dps = main_oh_dps .. "/" .. format("%.2f",oh_dps)
 		white_dps = (white_dps + oh_dps)*(1-DUAL_WIELD_HIT_PENALTY/100)
 	end
 	local misses_etc = (1+BASE_MISS_CHANCE_PHYSICAL[3]/100)*(1+BASE_ENEMY_DODGE_CHANCE[3]/100)*(1+BASE_ENEMY_PARRY_CHANCE[3]/100) -- hopefully the right formula
