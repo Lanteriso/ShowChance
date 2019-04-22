@@ -1,5 +1,11 @@
 
 local ShowChance = CreateFrame("Frame")
+local ShowChance_UpdateInterval = 1.0
+local N,IL,AL,TF,HP,MP,CB,HL,SH,WQSH,GQ,S,A,CC,H,M,V,LS,DC,PC,BC,MSS,MS,GS,GCD,FPS,YC,MN,IL_C,janyminDamage,janymaxDamage,janywhite_dps,base, posBuff, negBuff,effectiveA,effectiveB,effectiveC,S_C,AG_C,_,IN_C,A_C
+
+local janycoloredText={}
+local janyRecordHigh ={}
+
 -- 首次登陆加载
 
 local ShowChance_Load = CreateFrame("Frame")
@@ -39,10 +45,7 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_InterruptLists["移动速度"] == nil then ST_InterruptLists["移动速度"] = false end   --移动速度%
 		if ST_InterruptLists["移速"] == nil then ST_InterruptLists["移速"] = true end   --移动速度
 		if ST_InterruptLists["攻速"] == nil then ST_InterruptLists["攻速"] = true end   --攻击速度
-		if ST_InterruptLists["GCD"] == nil then ST_InterruptLists["GCD"] = true end   --GCD
-		if ST_InterruptLists["FPS"] == nil then ST_InterruptLists["FPS"] = true end   --FPS
-		if ST_InterruptLists["延迟"] == nil then ST_InterruptLists["延迟"] = true end   --延迟
-		if ST_InterruptLists["钱"] == nil then ST_InterruptLists["钱"] = false end   --钱
+
 
 		--[[
 		if ST_TextList == nil then ST_TextList = {} end
@@ -62,8 +65,6 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_TextList[14] == nil then ST_TextList[14] = "攻速" end --移动速度
 		]]
 
-		if janycoloredText == nil then janycoloredText={} end
-		if janyRecordHigh == nil then janyRecordHigh ={} end
 
 	end
 end)
@@ -169,60 +170,9 @@ end)
 InterfaceOptions_AddCategory(ST_Options)
 
 
-ShowChance_UpdateInterval = 1.0; -- how often to update the info
-
--- init variables
-playerClass, englishClass = UnitClass("player");
-if not LD_iCurrent then
-	LD_iCurrent = 1
-end
-if not LD_iCurrent2 then
-	LD_iCurrent2 = 1
-end
-if not LD_iCurrent3 then
-	LD_iCurrent3 = 28
-end
-if not LD_iCurrent4 then
-	LD_iCurrent4 = 28
-end
-if not RecordHigh then
-	RecordHigh = {[1] = 0, [2] = 0}
-end
 
 
-skillTable = {
-	[1]="unused", --Weapon Skill
-	[2]="unused", --Defense
-	[3]="躲闪",
-	[4]="招架",
-	[5]="格挡",
-	[6]="Melee Hit",
-	[7]="Ranged Hit",
-	[8]="Spell Hit",
-	[9]="Melee 爆击",
-	[10]="Ranged 爆击",
-	[11]="Spell 爆击",
-	[12]="Mana 法力回复",
-	[13]="精通",
-	[14]="unused", --CR_HIT_TAKEN_SPELL 
-	[15]="PvP Resilience",--"Melee Resilience", --COMBAT_RATING_RESILIENCE_CRIT_TAKEN 
-	[16]="unused",--"Ranged Resilience", --COMBAT_RATING_RESILIENCE_PLAYER_DAMAGE_TAKEN 
-	[17]="unused", --"Spell Resilience", --CR_CRIT_TAKEN_SPELL 
-	[18]="Melee 急速",
-	[19]="Ranged 急速",
-	[20]="Spell 急速",
-	[21]="unused", --Mainhand Skill
-	[22]="unused", --Offhand Skill
-	[23]="unused", --Ranged Skill
-	[24]="Expertise",
-	[25]="Armor Penetration",
-	[26]="unused",--CR_MASTERY
-	[27]="PvP Power",
 
-	[28]="爆击",
-	[29]="急速",
-	[30]="精通"
-}
 
 -- OnLoad event
 function ShowChance_OnLoad()
@@ -230,30 +180,16 @@ function ShowChance_OnLoad()
 
 end
 
--- Config Panel Code
- MyAddon = {};
- MyAddon.panel = CreateFrame( "Frame", "MyAddonPanel", UIParent );
- -- Register in the Interface Addon Options GUI
- -- Set the name for the Category for the Options Panel
- MyAddon.panel.name = "ShowChance";
- -- Add the panel to the Interface Options
- --InterfaceOptions_AddCategory(MyAddon.panel);
- 
- function LiveDamagConfig_Frame_OnShow()
-	-- read settings from profile, and change our checkbuttons and slider to represent them
- -- 	getglobal(this:GetName().."CheckButtonOn"):SetChecked( myClockConfig[myClockRealm][myClockChar].on );
- -- 	getglobal(this:GetName().."CheckButtonTime24"):SetChecked( myClockConfig[myClockRealm][myClockChar].time24 );		
- -- 	getglobal(this:GetName().."SliderOffset"):SetValue( myClockConfig[myClockRealm].offset );
- end
+
 --JANY进入战斗离开战斗
 ShowChance:RegisterEvent("PLAYER_REGEN_DISABLED")
 ShowChance:RegisterEvent("PLAYER_REGEN_ENABLED")   
 ShowChance:SetScript("OnEvent", function (self,event)
 	if event == "PLAYER_REGEN_ENABLED" then
-		ShowChance_UpdateInterval = 1.0--没进战斗刷新频率
+		--ShowChance_UpdateInterval = 1.0--没进战斗刷新频率
 		UIFrameFadeOut(ShowChance_FrameText, 2, 1, 0.5)--淡入
 	elseif event == "PLAYER_REGEN_DISABLED" then
-		ShowChance_UpdateInterval = 1.0--进战斗刷新频率
+		--ShowChance_UpdateInterval = 1.0--进战斗刷新频率
 		UIFrameFadeOut(ShowChance_FrameText, 2, 0.5, 1)--淡入
 				
 	end	
@@ -280,7 +216,6 @@ local function GetAzeriteLevel()--项链等级
 	return level
 end	
 function ShowChance_GetColor(janydatacontrast,janyserialnumber)
-
 	if janycoloredText[janyserialnumber] == nil then janycoloredText[janyserialnumber]="|cFFFFFFFF" end
 
 	if janyRecordHigh[janyserialnumber] then
@@ -339,15 +274,16 @@ local function mystrangefunction()
 end
 
 --武器自动攻击(白字)每秒伤害
-local function JanyJustGetDamage(unit)
-	local function JustGetDamage(unit)
-		if IsRangedWeapon() then
-			local attackTime, minDamage, maxDamage = UnitRangedDamage(unit);
-			return minDamage, maxDamage, nil, nil;
-		else
-			return UnitDamage(unit);
-		end
+local function JustGetDamage(unit)
+	if IsRangedWeapon() then
+		local attackTime, minDamage, maxDamage = UnitRangedDamage(unit);
+		return minDamage, maxDamage, nil, nil;
+	else
+		return UnitDamage(unit);
 	end
+end
+local function JanyJustGetDamage(unit)
+
 	local speed, offhandSpeed = UnitAttackSpeed("player");
 	local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage = JustGetDamage(unit);
 	local fullDamage = (minDamage + maxDamage)/2;
@@ -380,7 +316,9 @@ function ShowChance_OnUpdate(self, elapsed,event)
 
 	if (self.TimeSinceLastUpdate > ShowChance_UpdateInterval) then
 
-		if(LD_iCurrent3 == 28) then
+		if 2>1 then
+			
+
 
 			if ST_InterruptLists["玩家名称"] then
 				N =UnitName("player").."\n|r"
@@ -389,8 +327,9 @@ function ShowChance_OnUpdate(self, elapsed,event)
 			end
 			
 			if ST_InterruptLists["装等"] then
-				IL_C = {GetAverageItemLevel()}
-				IL = "物品等级 "..string.format("%.1f", IL_C[2]).."\n|r"		--	物品等级
+				_,IL_C = GetAverageItemLevel()
+				IL = "物品等级 "..string.format("%.1f", IL_C).."\n|r"		--	物品等级
+
 			else
 				IL = ""
 			end	
@@ -428,14 +367,14 @@ function ShowChance_OnUpdate(self, elapsed,event)
 				HL =""
 			end
 			if ST_InterruptLists["伤害"] then
-				minDamage,maxDamage,white_dps = JanyJustGetDamage("player")
-				SH = "伤害  "..ShowChance_GetColor(string.format("%.2f",minDamage),"伤害")..string.format("%.2f",minDamage).." - "..string.format("%.2f",maxDamage).."\n|r" 
+				janyminDamage,janymaxDamage,_ = JanyJustGetDamage("player")
+				SH = "伤害  "..ShowChance_GetColor(string.format("%.2f",janyminDamage),"伤害")..string.format("%.2f",janyminDamage).." - "..string.format("%.2f",janymaxDamage).."\n|r" 
 			else
 				SH =""
 			end
 			if ST_InterruptLists["武器伤害"] then
-				minDamage,maxDamage,white_dps = JanyJustGetDamage("player")
-				WQSH = "武器伤害  "..ShowChance_GetColor(white_dps,"武器伤害")..white_dps.."\n|r" 
+				_,_,janywhite_dps = JanyJustGetDamage("player")
+				WQSH = "武器伤害  "..ShowChance_GetColor(janywhite_dps,"武器伤害")..janywhite_dps.."\n|r" 
 			else
 				WQSH =""
 			end
@@ -458,6 +397,7 @@ function ShowChance_OnUpdate(self, elapsed,event)
 				S_C = UnitStat("player",1)							-- 力量
 				AG_C = UnitStat("player",2)							-- 敏捷
 				IN_C = UnitStat("player",4)							-- 智力
+
 				if S_C > AG_C and S_C > IN_C then
 					S = "力量 "..ShowChance_GetColor(S_C,"力量")..S_C.."\n|r"
 				elseif AG_C > S_C and AG_C > IN_C then
@@ -469,13 +409,11 @@ function ShowChance_OnUpdate(self, elapsed,event)
 				S = ""
 			end
 			if ST_InterruptLists["护甲"] then	
-				A_C = {UnitArmor("player")}
-				A = "护甲 "..ShowChance_GetColor(A_C[2],"护甲")..A_C[2].."\n|r"
+				_,A_C = UnitArmor("player")
+				A = "护甲 "..ShowChance_GetColor(A_C,"护甲")..A_C.."\n|r"
 			else
 				A = ""
 			end
-			
-
 			if ST_InterruptLists["暴击"] then 
 				CC = "暴击 "..ShowChance_GetColor(GetCritChance(),"暴击")..string.format("%.1f", GetCritChance()).."%\n|r" 
 			else
@@ -536,93 +474,16 @@ function ShowChance_OnUpdate(self, elapsed,event)
 			else
 				GS = ""
 			end
-			if ST_InterruptLists["GCD"] then
-				GCD = "GCD "..ShowChance_GetColor(max(0.75, 1.5 * 100 / (100+GetHaste())),"GCD")..string.format("%.2f",max(0.75, 1.5 * 100 / (100+GetHaste()))).."s\n|r" --GCD
-			else
-				GCD = ""
-			end
-			if ST_InterruptLists["FPS"] then
-				FPS = "FPS "..ShowChance_GetColor(floor(GetFramerate()),"FPS")..floor(GetFramerate()).."\n|r" --FPS
-			else
-				FPS = ""
-			end
-			if ST_InterruptLists["延迟"] then
-				bandwidthIn, bandwidthOut, latencyHome, latencyWorld = GetNetStats();
-				YC = "延迟 "..ShowChance_GetColor(latencyHome,"延迟")..latencyHome.." ms\n|r" --延迟
-			else
-				YC = ""
-			end
-			if ST_InterruptLists["钱"] then
-				MN = "钱 "..ShowChance_GetColor(floor(GetMoney()/10000),"钱")..floor(GetMoney()/10000).." 金\n|r" --钱
-			else
-				MN = ""floor(GetMoney()/10000)
-			end
+
+
 
 		end		
 
-	
-		-- get the data
-		if(LD_iCurrent2 == 1) then
-			classtype = "caster";
-			line1text = GetSpellBonusDamage(3);
-		else
-			classtype = "melee";
-			base, posBuff, negBuff = UnitAttackPower("player");
-
-			iAttackPower = base + posBuff;
-			line1text = iAttackPower;
-		end
-		if(LD_iCurrent == 9) then
-			line2text = numberToPercent(GetCritChance());--爆击
-		elseif(LD_iCurrent == 10) then
-			line2text = numberToPercent(GetRangedCritChance());
-		elseif(LD_iCurrent == 11) then
-			line2text = numberToPercent(GetSpellCritChance(3));
-		elseif(LD_iCurrent == 12) then
-			base, casting = GetManaRegen();
-			line2text = floor( (base * 5)  + .5 );
-		elseif(LD_iCurrent == 13) then
-			line2text = round(GetMastery(), 2);
-		elseif(LD_iCurrent == 24) then
-			expertise, offhandExpertise = GetExpertise();
-			line2text = expertise;
-		else
-			line2text = GetCombatRating(LD_iCurrent);
-		end
---/script ChatFrame1:AddMessage(GetCombatRating(12)
-		
-		-- format the text for output
-		if (classtype == "melee") then
-			line1label = "力量: ";
-			iRH = 2;
-		else
-			line1label = "智力: ";
-			iRH = 1;
-		end
-
-		coloredText = {};
-		if (line1text > RecordHigh[iRH]) then
-
-			RecordHigh[iRH] = line1text;
-			newRecordMessage = "+ |cFFFF0000ShowChance :: |rNew Highest "..line1label.." |cFFFF7F50"..line1text;
-			--ChatFrame1:AddMessage(newRecordMessage);--力晕有新高时
-			coloredText[1] = "|cFFFF7F50";
-		else
-
-			coloredText[1] = "";
-			--DEBUG--ChatFrame1:AddMessage("line1text: "..line1text..", RecordHigh[1]: "..RecordHigh[1]);
-		end
-		
-		line1forOutput = line1label..coloredText[1]..comma_value(line1text);
-
-		
-		-- actual output
-		--ShowChance_FrameText:SetText(line1forOutput.."\n|r"..skillTable[LD_iCurrent]..": "..comma_value(line2text).."\n|r"..skillTable[LD_iCurrent3]..": "..line3text.."%");
 
 
 		ShowChance_FrameText:SetJustifyH("LEFT")
 		ShowChance_FrameText:SetFont(GameFontNormal:GetFont(), SFF)
-		ShowChance_FrameText:SetText(N..IL..AL..TF..HP..MP..CB..HL..SH..WQSH..GQ..S..A..CC..H..M..V..LS..DC..PC..BC..MSS..MS..GS..GCD..FPS..YC..MN);
+		ShowChance_FrameText:SetText(N..IL..AL..TF..HP..MP..CB..HL..SH..WQSH..GQ..S..A..CC..H..M..V..LS..DC..PC..BC..MSS..MS..GS);
 		-- reset update counter
 		self.TimeSinceLastUpdate = 0;
 	end --end if updating
@@ -633,29 +494,8 @@ function numberToPercent(x)
 	return format("%.2f%%", x);
 end
 
-function ShowChance_flip1()
-	if(LD_iCurrent < 27) then
-		LD_iCurrent = LD_iCurrent + 1;
-		if(skillTable[LD_iCurrent] == "unused") then
-			while(skillTable[LD_iCurrent] == "unused") do
-				LD_iCurrent = LD_iCurrent + 1;
-			end
-		end
-	else
-		LD_iCurrent = 3;
-	end
-end
 
-function ShowChance_flip2()
-	if(LD_iCurrent2 == 2) then
-		LD_iCurrent2 = 1;
-	else
-		LD_iCurrent2 = 2;
-	end
-end
-function ShowChance_flip3()
 
-end
 
 
 function SetInterval(val)
@@ -663,22 +503,12 @@ function SetInterval(val)
 end
 
 
-function showHighScore()--显示高分
-	if(LD_iCurrent2 == 1) then
-		recordText = "最高法术力量: ";
-		iRH = 1;
-	else
-		recordText = "最高攻击力: ";
-		iRH = 2;
-	end
-	highRecordMessage = "+ |cFFFF0000ShowChance :: |r"..recordText.." |cFFFF7F50"..comma_value(RecordHigh[iRH]);
-	ChatFrame1:AddMessage(highRecordMessage);
-end
+
 
 SLASH_ShowChance1, SLASH_ShowChance1 = "/sc", "/ShowChance";
 SlashCmdList["ShowChance"] = function(msg, editBox)
 --	InterfaceOptionsFrame_OpenToCategory("ShowChance");
-	--showHighScore();
+
 		hendlers(msg);
 		
 end
