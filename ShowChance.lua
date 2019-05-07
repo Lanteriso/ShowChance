@@ -45,7 +45,7 @@ ShowChance_Load:SetScript("OnEvent", function(_, event, addon)
 		if ST_InterruptLists["移动速度"] == nil then ST_InterruptLists["移动速度"] = false end   --移动速度%
 		if ST_InterruptLists["移速"] == nil then ST_InterruptLists["移速"] = true end   --移动速度
 		if ST_InterruptLists["攻速"] == nil then ST_InterruptLists["攻速"] = true end   --攻击速度
-
+		if ST_InterruptLists["GCD"] == nil then ST_InterruptLists["GCD"] = true end   --GCD
 
 		--[[
 		if ST_TextList == nil then ST_TextList = {} end
@@ -177,6 +177,7 @@ InterfaceOptions_AddCategory(ST_Options)
 -- OnLoad event
 function ShowChance_OnLoad()
   ChatFrame1:AddMessage("|cFFFF0000【ShowChance】属性显示已开启,祝你波波有爆发,天天出泰坦.");
+  UIFrameFadeOut(ShowChance_FrameText, 2, 0.5, 0.5)
 
 end
 
@@ -187,10 +188,10 @@ ShowChance:RegisterEvent("PLAYER_REGEN_ENABLED")
 ShowChance:SetScript("OnEvent", function (self,event)
 	if event == "PLAYER_REGEN_ENABLED" then
 		--ShowChance_UpdateInterval = 1.0--没进战斗刷新频率
-		UIFrameFadeOut(ShowChance_FrameText, 2, 1, 0.5)--淡入
+		UIFrameFadeOut(ShowChance_FrameText, 2, 0.9, 0.5)--淡入
 	elseif event == "PLAYER_REGEN_DISABLED" then
 		--ShowChance_UpdateInterval = 1.0--进战斗刷新频率
-		UIFrameFadeOut(ShowChance_FrameText, 2, 0.5, 1)--淡入
+		UIFrameFadeOut(ShowChance_FrameText, 2, 0.5, 0.9)--淡入
 				
 	end	
 end);
@@ -215,7 +216,7 @@ local function GetAzeriteLevel()--项链等级
 	end
 	return level
 end	
-function ShowChance_GetColor(janydatacontrast,janyserialnumber)
+function ShowChance_GetColor(janydatacontrast,janyserialnumber)--数值 名称
 	if janycoloredText[janyserialnumber] == nil then janycoloredText[janyserialnumber]="|cFFFFFFFF" end
 
 	if janyRecordHigh[janyserialnumber] then
@@ -410,7 +411,7 @@ function ShowChance_OnUpdate(self, elapsed,event)
 			end
 			if ST_InterruptLists["护甲"] then	
 				_,A_C = UnitArmor("player")
-				A = "护甲 "..ShowChance_GetColor(A_C,"护甲")..A_C.."\n|r"
+				A = "护甲 "..ShowChance_GetColor(A_C,"护甲")..A_C.."-"..string.format("%.1f", (A_C / (A_C+6300)*100)).."%\n|r"
 			else
 				A = ""
 			end
@@ -464,7 +465,7 @@ function ShowChance_OnUpdate(self, elapsed,event)
 				MSS = ""
 			end
 			if ST_InterruptLists["移速"] then
-				MS = "移速 "..ShowChance_GetColor(GetUnitSpeed("player",1),"移速")..string.format("%.1f", GetUnitSpeed("player",1)).."m/s\n|r" --移动速度
+				MS = "移速 "..ShowChance_GetColor(GetUnitSpeed("player",1),"移速")..string.format("%.1f", GetUnitSpeed("player",1)).."\n|r" --移动速度
 			else
 				MS = ""
 			end
@@ -474,7 +475,11 @@ function ShowChance_OnUpdate(self, elapsed,event)
 			else
 				GS = ""
 			end
-
+			if ST_InterruptLists["GCD"] then
+				GCD = "GCD  "..ShowChance_GetColor(max(0.75, 1.5 * 100 / (100+GetHaste())),"GCD")..string.format("%.2f",max(0.75, 1.5 * 100 / (100+GetHaste()))).."s\n|r" --GCD
+			else
+				GCD = ""
+			end
 
 
 		end		
@@ -482,8 +487,9 @@ function ShowChance_OnUpdate(self, elapsed,event)
 
 
 		ShowChance_FrameText:SetJustifyH("LEFT")
-		ShowChance_FrameText:SetFont(GameFontNormal:GetFont(), SFF)
-		ShowChance_FrameText:SetText(N..IL..AL..TF..HP..MP..CB..HL..SH..WQSH..GQ..S..A..CC..H..M..V..LS..DC..PC..BC..MSS..MS..GS);
+		--ShowChance_FrameText:SetFont("Interface\\AddOns\\ShowChance\\impact.ttf",SFF,"THICKOUTLINE")
+		ShowChance_FrameText:SetFont(GameFontNormal:GetFont(), SFF,"THICKOUTLINE")
+		ShowChance_FrameText:SetText(N..IL..AL..TF..HP..MP..CB..HL..SH..WQSH..GQ..S..A..CC..H..M..V..LS..DC..PC..BC..MSS..MS..GS..GCD);
 		-- reset update counter
 		self.TimeSinceLastUpdate = 0;
 	end --end if updating
@@ -555,5 +561,5 @@ function comma_value(amount)
 end
 
 
-UIFrameFadeOut(ShowChance_FrameText, 1, 0.2, 0.8)
+
 
